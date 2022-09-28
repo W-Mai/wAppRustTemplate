@@ -1,12 +1,17 @@
 [package]
-name = "hello2"
+name = "wApp"
 version = "0.1.0"
 edition = "2021"
+
+[[bin]]
+name = "app"
+path = "src/app.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 wee_alloc = { version = "0.4.5" }
+
 
 # 使用`cargo build`编译时需要的配置
 [profile.dev]
