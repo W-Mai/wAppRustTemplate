@@ -11,15 +11,16 @@ extern "C" {
     pub fn log_print_i32(num: i32);
 }
 
+
 pub mod log {
     #[macro_export]
     macro_rules! print {
         ($arg:tt) => {{
-            _debug($arg.as_ptr(), $arg.len())
+            unsafe { _debug($arg.as_ptr(), $arg.len()) }
         }};
         ($($arg:tt)+) => {{
             let s = format!($($arg)+);
-            _debug(s.as_ptr(), s.len())
+            unsafe { _debug(s.as_ptr(), s.len()) }
         }}
     }
 
@@ -27,18 +28,18 @@ pub mod log {
     macro_rules! println {
         ($($arg:tt)*) => {{
             print!($($arg)+);
-            _debug("\n".as_ptr(), 1)
+            unsafe { _debug("\n".as_ptr(), 1) }
         }}
     }
 
     #[macro_export]
     macro_rules! log {
         ($arg:tt) => {{
-            log_print($arg.as_ptr(), $arg.len())
+            unsafe { log_print($arg.as_ptr(), $arg.len()) }
         }};
         ($($arg:tt)+) => {{
             let s = format!($($arg)+);
-            log_print(s.as_ptr(), s.len())
+            unsafe { log_print(s.as_ptr(), s.len()) }
         }}
     }
 }
