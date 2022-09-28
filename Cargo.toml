@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-buddy_system_allocator = "0.8.0"
+wee_alloc = { version = "0.4.5" }
 
 # 使用`cargo build`编译时需要的配置
 [profile.dev]
@@ -16,4 +16,4 @@ panic = "abort" # 禁用panic时栈展开
 [profile.release]
 panic = "abort" # 禁用panic时栈展开
 opt-level = 3
-strip=true
+strip = true

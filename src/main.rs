@@ -1,62 +1,89 @@
 #![no_std]
 #![no_main]
-#![feature(alloc_error_handler)]
+#![feature(alloc_error_handler, core_intrinsics)]
 
 extern crate alloc;
 
-use alloc::borrow::ToOwned;
-use alloc::ffi::CString;
+use alloc::{format, vec};
+use alloc::boxed::Box;
 use alloc::string::String;
-use core::alloc::GlobalAlloc;
-use core::ffi::{c_char, CStr};
 use core::panic::PanicInfo;
+
 
 extern "C" {
     fn clock_ms() -> i32;
-    fn _debug(ptr: *const c_char, len: i32) -> i32;
+    fn log_print(ptr: *const u8, len: usize);
     fn log_print_i32(num: i32);
+}
+
+mod log {
+    #[macro_export]
+    macro_rules! print {
+        ($arg:tt) => {{
+            log_print($arg.as_ptr(), $arg.len())
+        }};
+        ($($arg:tt)+) => {{
+            let s = format!($($arg)+);
+            log_print(s.as_ptr(), s.len())
+        }}
+    }
 }
 
 
 #[panic_handler]
+#[no_mangle]
 fn panic(_info: &PanicInfo) -> ! {
-    loop {}
+    ::core::intrinsics::abort();
 }
 
 #[alloc_error_handler]
-unsafe fn foo(_: core::alloc::Layout) -> ! {
-    let s = "ALLOCATE FAILED";
+#[no_mangle]
+fn oom(_: core::alloc::Layout) -> ! {
+    // let s = "ALLOCATE FAILED";
     // _debug(s.as_ptr(), s.len() as i32);
-    loop {}
+    ::core::intrinsics::abort();
 }
 
-use buddy_system_allocator::*;
 
+// Use `wee_alloc` as the global allocator.
 #[global_allocator]
-static HEAP_ALLOCATOR: LockedHeap<1024> = LockedHeap::<1024>::empty();
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
+static mut GNUM: i32 = 3;
 
 #[no_mangle]
-unsafe fn fuck() -> i32 {
+unsafe fn test() -> i32 {
     let a: i32 = 4321;
     log_print_i32(a);
     log_print_i32(777);
 
-    let mut s = "remembrance";
-    // let s2 = "kuc";
+    let vec = vec!["I", "am", "your", "father"];
 
-    // let s = s.to_owned() + &s2;
-    let mut hello = String::from("Hello World!");
-    let c_str_to_print = CString::new(hello).unwrap();
-
+    let nums = format!("{} {} {}", 1, 2, 3);
     log_print_i32("114514".parse().expect("nothing"));
+    for s in vec {
+        print!(s);
+    }
 
-    _debug(c_str_to_print.as_ptr(), 14);
-    666
+    print!(nums);
+
+    log_print_i32(GNUM);
+    GNUM += 1;
+
+    clock_ms()
 }
 
 #[no_mangle]
-fn init(_addr: usize) {
-    unsafe {
-        HEAP_ALLOCATOR.lock().init(0, 100);
-    }
+unsafe fn xalloc(len: usize) -> *mut usize {
+    Box::into_raw(Box::new(len))
+}
+
+#[no_mangle]
+unsafe fn init(_addr: *mut usize, len: usize) {
+    let s = format!("pass from host : {}", _addr as u64);
+    print!(s);
+    print!("converted: {}", s.as_ptr() as u64);
+
+    let s = String::from_raw_parts(_addr as *mut u8, len, 0);
+    print!(s);
 }
