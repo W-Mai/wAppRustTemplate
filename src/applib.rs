@@ -27,7 +27,7 @@ pub mod log {
     #[macro_export]
     macro_rules! println {
         ($($arg:tt)*) => {{
-            print!($($arg)+);
+            print!($($arg)*);
             unsafe { _debug("\n".as_ptr(), 1) }
         }}
     }
