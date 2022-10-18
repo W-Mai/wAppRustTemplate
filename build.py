@@ -13,7 +13,7 @@ opj = os.path.join
 target_path = "target/wasm32-wasi/release"
 target_name = "app.wasm"
 target = opj(target_path, target_name)
-sim_path = os.environ.get("SIM_PATH", "../../Vendor/Simulator/build")
+sim_path = os.environ.get("SIM_PATH", "../../../Vendor/Simulator/build")
 
 
 def build_and_optimize():
