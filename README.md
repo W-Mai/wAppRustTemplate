@@ -2,8 +2,6 @@
 
 To build this project:
 
-- change `cp_target_path` in `build.sh` file first.
-
 ```shell
 export SIM_PATH=path/to/Simulator/build; ./build.py
 ```
