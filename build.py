@@ -16,6 +16,39 @@ target = opj(target_path, target_name)
 sim_path = os.environ.get("SIM_PATH", "../../../Vendor/Simulator/build")
 
 
+def check_env():
+    # Check RUST
+    try:
+        run(["cargo", "--version"], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    except FileNotFoundError:
+        log("😭😭😭", "You should install the latest version of RUST toolchain according to the following")
+        log("🐧🐧🐧", "Linux:", "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh")
+        log("🪟🪟🪟", "Windows:", "https://www.rust-lang.org/learn/get-started")
+        exit()
+
+    # Check Toolchain
+    res = run(["rustup", "toolchain", "list"], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    if res.returncode:
+        log("😭😭😭", "I don't know why")
+        exit()
+    else:
+        if not any(map(lambda x: "nightly" in x and "override" in x, res.stdout.split('\n'))):
+            log("😭😂😢", "Please change toolchain to NIGHTLY")
+            log("🦀🦀🦀", "exec:", "rustup override set nightly")
+            exit()
+
+    # Check Target
+    res = run(["rustup", "target", "list"], stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    if res.returncode:
+        log("😭😭😭", "I don't know why")
+        exit()
+    else:
+        if not "wasm32-wasi (installed)" in res.stdout.split('\n'):
+            log("😭😂😢", "Please install wasm32-wasi target")
+            log("🦀🦀🦀", "exec:", "rustup target add wasm32-wasi")
+            exit()
+
+
 def build_and_optimize():
     log("⌚️", "Start Build")
     if run(["cargo", "build", "--release", "--target", "wasm32-wasi"]).returncode:
@@ -23,12 +56,17 @@ def build_and_optimize():
         exit()
     log("🙆", "End Build")
     log("⌚️", "Start Optimize && Strip")
-    if run(["wasm-opt", target, "-Os", "-o", f"{target}.opt"]).returncode:
-        log("😭😭😭", "Optimize Failed")
-        exit()
-    shutil.copy(f"{target}.opt", f"{target}.opt.old")
-    if run(["wasm-strip", f"{target}.opt"]).returncode:
-        log("😭😭😭", "Strip Failed")
+    try:
+        if run(["wasm-opt", target, "-Os", "-o", f"{target}.opt"]).returncode:
+            log("😭😭😭", "Optimize Failed")
+            exit()
+        shutil.copy(f"{target}.opt", f"{target}.opt.old")
+        if run(["wasm-strip", f"{target}.opt"]).returncode:
+            log("😭😭😭", "Strip Failed")
+            exit()
+    except FileNotFoundError:
+        log("😭😭😭", "Maybe you need install wabt and binaryen")
+        log("👋🤌👀", "Please follow this README.md")
         exit()
 
     log(f'{os.path.getsize(target):8d} Byte\t', target_name)
@@ -55,5 +93,6 @@ def run_sim():
 
 
 if __name__ == '__main__':
+    check_env()
     build_and_optimize()
     run_sim()
