@@ -3,6 +3,8 @@ name = "wApp"
 version = "0.1.0"
 edition = "2021"
 authors = ["https://github.com/W-Mai"]
+repository = "https://github.com/W-Mai/wAppRustTemplate"
+
 
 [[bin]]
 name = "app"
