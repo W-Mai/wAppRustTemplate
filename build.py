@@ -17,7 +17,7 @@ sim_path = os.environ.get("SIM_PATH", "../../../Vendor/Simulator/build")
 
 
 def build_and_optimize():
-    log("Start Build")
+    log("⌚", "Start Build")
     if run(["cargo", "build", "--release", "--target", "wasm32-wasi"]).returncode:
         log("😭😭😭", "Build Failed")
         exit()
