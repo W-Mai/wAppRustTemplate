@@ -2,7 +2,7 @@ use core::panic::PanicInfo;
 
 // Use `wee_alloc` as the global allocator.
 #[global_allocator]
-pub static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+pub static ALLOC: wasm_allocator::Heap = wasm_allocator::Heap;
 
 extern "C" {
     pub fn clock_ms() -> i32;

@@ -1,3 +1,4 @@
+cargo-features = ["profile-rustflags"]
 [package]
 name = "wApp"
 version = "0.1.1"
@@ -13,8 +14,7 @@ path = "src/app.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-wee_alloc = { version = "0.4.5" }
-
+wasm_allocator = { git = "https://github.com/W-Mai/wasm_allocator", branch = "main" }
 
 # 使用`cargo build`编译时需要的配置
 [profile.dev]
@@ -25,3 +25,8 @@ panic = "abort" # 禁用panic时栈展开
 panic = "abort" # 禁用panic时栈展开
 opt-level = 3
 strip = true
+lto = true
+rustflags = [
+    "-C", "link-arg=--global-base=0",
+    "-C", "link-arg=-zstack-size=2048",
+]
