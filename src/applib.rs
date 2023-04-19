@@ -14,7 +14,16 @@ pub mod xwu {
     #[link(wasm_import_module = "xwu")]
     extern "C" {
         #[link_name = "wu_obj_create"]
-        pub fn obj_create(tid: i32, par: u64) -> u64;
+        pub fn obj_create(oid: i32, par: u64) -> u64;
+
+        #[link_name = "wu_obj_destroy"]
+        pub fn obj_destroy(oid: i32, obj: u64) -> u64;
+
+        #[link_name = "wu_obj_get_attr"] // ErrorCode wu_obj_get_attr(void *obj, id_type_t type, void *res, ...);
+        pub fn obj_get_attr(obj: u64, tid: i32, res: *mut u8, par: ...) -> i32;
+
+        #[link_name = "wu_obj_set_attr"] // ErrorCode wu_obj_set_attr(void *obj, id_type_t type, void *res, ...);
+        pub fn obj_set_attr(obj: u64, tid: i32, res: *mut u8, par: ...) -> i32;
     }
 }
 
