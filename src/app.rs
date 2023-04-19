@@ -7,6 +7,7 @@ extern crate alloc;
 use alloc::{format, vec};
 use alloc::boxed::Box;
 use alloc::string::String;
+use core::ptr::null_mut;
 use wasm_allocator::Heap;
 
 mod applib;
@@ -51,8 +52,21 @@ mod tests {
             GNUM += 1;
         }
     }
-}
 
+    pub fn test_gui_wrapper(par: u64) {
+        let mut res3 = 0;
+        unsafe {
+            let res = xwu::obj_create(1, par);
+            let res2 = xwu::obj_create(1, res);
+
+            xwu::obj_set_attr(res2, 152, null_mut(), 50);
+            xwu::obj_set_attr(res2, 153, null_mut(), 20);
+
+            xwu::obj_get_attr(res2, 151, &mut res3 as *mut i32 as *mut u8, 0);
+        }
+        println!("Width: {}", res3);
+    }
+}
 
 #[no_mangle]
 fn test(par: u64) -> i32 {
@@ -61,11 +75,7 @@ fn test(par: u64) -> i32 {
     tests::test_directly_println();
     tests::test_format_then_println();
     tests::test_parse_str_to_num_println();
-
-    unsafe {
-        let res = xwu::obj_create(1, par);
-        xwu::obj_create(1, res);
-    }
+    tests::test_gui_wrapper(par);
 
     unsafe { Heap::getHeapTop() as i32 }
 }
