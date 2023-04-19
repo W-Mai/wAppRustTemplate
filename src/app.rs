@@ -7,7 +7,6 @@ extern crate alloc;
 use alloc::{format, vec};
 use alloc::boxed::Box;
 use alloc::string::String;
-use core::ptr::null_mut;
 use wasm_allocator::Heap;
 
 mod applib;
@@ -21,6 +20,7 @@ static mut GNUM: i32 = 3;
 #[macro_use]
 mod tests {
     use crate::*;
+    use crate::applib::xwu::Obj;
 
     pub fn test_directly_println() {
         let a: i32 = 4321;
@@ -54,17 +54,16 @@ mod tests {
     }
 
     pub fn test_gui_wrapper(par: u64) {
-        let mut res3 = 0;
-        unsafe {
-            let res = xwu::obj_create(1, par);
-            let res2 = xwu::obj_create(1, res);
+        let screen = Obj::from(par);
 
-            xwu::obj_set_attr(res2, 152, null_mut(), 50);
-            xwu::obj_set_attr(res2, 153, null_mut(), 20);
+        let obj1 = Obj::new(&screen);
+        let obj2 = Obj::new(&obj1);
 
-            xwu::obj_get_attr(res2, 151, &mut res3 as *mut i32 as *mut u8, 0);
-        }
-        println!("Width: {}", res3);
+        obj2.set_x(50);
+        obj2.set_y(20);
+        obj1.set_width(300);
+
+        println!("Width: {}", obj1.get_width());
     }
 }
 
