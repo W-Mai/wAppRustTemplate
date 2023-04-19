@@ -76,7 +76,7 @@ fn test(par: u64) -> i32 {
     tests::test_parse_str_to_num_println();
     tests::test_gui_wrapper(par);
 
-    unsafe { Heap::getHeapTop() as i32 }
+    Heap::get_heap_top() as i32
 }
 
 
