@@ -7,6 +7,7 @@ extern crate alloc;
 use alloc::{format, vec};
 use alloc::boxed::Box;
 use alloc::string::String;
+use wasm_allocator::Heap;
 
 mod applib;
 
@@ -54,14 +55,19 @@ mod tests {
 
 
 #[no_mangle]
-fn test() -> i32 {
+fn test(par: u64) -> i32 {
     tests::test_vec_log();
     tests::test_global_add();
     tests::test_directly_println();
     tests::test_format_then_println();
     tests::test_parse_str_to_num_println();
 
-    unsafe { clock_ms() }
+    unsafe {
+        let res = xwu::obj_create(1, par);
+        xwu::obj_create(1, res);
+    }
+
+    unsafe { Heap::getHeapTop() as i32 }
 }
 
 

@@ -1,6 +1,5 @@
 use core::panic::PanicInfo;
 
-// Use `wee_alloc` as the global allocator.
 #[global_allocator]
 pub static ALLOC: wasm_allocator::Heap = wasm_allocator::Heap;
 
@@ -9,6 +8,14 @@ extern "C" {
     pub fn log_print(ptr: *const u8, len: usize);
     pub fn _debug(ptr: *const u8, len: usize) -> i32;
     pub fn log_print_i32(num: i32);
+}
+
+pub mod xwu {
+    #[link(wasm_import_module = "xwu")]
+    extern "C" {
+        #[link_name = "wu_obj_create"]
+        pub fn obj_create(tid: i32, par: u64) -> u64;
+    }
 }
 
 
