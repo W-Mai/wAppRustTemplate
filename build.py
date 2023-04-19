@@ -3,17 +3,19 @@ import functools
 import os
 import shutil
 import subprocess
-import pathlib
+from pathlib import Path
 
 PROMPT = "--> "
 run = functools.partial(subprocess.run, encoding='utf-8')
 log = functools.partial(print, PROMPT)
-opj = os.path.join
 
 target_path = "target/wasm32-unknown-unknown/release"
 target_name = "app.wasm"
-target = opj(target_path, target_name)
-sim_path = os.environ.get("SIM_PATH", "../../../Vendor/Simulator/build")
+target = Path(target_path, target_name)
+local_build_path = Path("./build")
+
+sim_name = "Simulator"
+sim_path = Path(os.environ.get("SIM_PATH", "../../../Vendor/Simulator/build"))
 
 
 def check_env():
@@ -43,13 +45,17 @@ def check_env():
         log("😭😭😭", "I don't know why")
         exit()
     else:
-        if not "wasm32-wasi (installed)" in res.stdout.split('\n'):
+        if "wasm32-wasi (installed)" not in res.stdout.split('\n'):
             log("😭😂😢", "Please install wasm32-wasi target")
             log("🦀🦀🦀", "exec:", "rustup target add wasm32-wasi")
             exit()
 
 
 def build_and_optimize():
+    default = ".wasm"
+    w_optim = ".wasm.opt"
+    w_strip = ".wasm.strip"
+
     log("⌚️", "Start Build")
     if run(["cargo", "build", "--release", "--target", "wasm32-unknown-unknown"]).returncode:
         log("😭😭😭", "Build Failed")
@@ -57,11 +63,11 @@ def build_and_optimize():
     log("🙆", "End Build")
     log("⌚️", "Start Optimize && Strip")
     try:
-        if run(["wasm-opt", target, "-Os", "-o", f"{target}.opt"]).returncode:
+        if run(["wasm-opt", target, "-Os", "-o", target.with_suffix(w_optim)]).returncode:
             log("😭😭😭", "Optimize Failed")
             exit()
-        shutil.copy(f"{target}.opt", f"{target}.opt.old")
-        if run(["wasm-strip", f"{target}.opt"]).returncode:
+        shutil.copy(target.with_suffix(w_optim), target.with_suffix(w_strip))
+        if run(["wasm-strip", target.with_suffix(w_strip)]).returncode:
             log("😭😭😭", "Strip Failed")
             exit()
     except FileNotFoundError:
@@ -69,24 +75,24 @@ def build_and_optimize():
         log("👋🤌👀", "Please follow this README.md")
         exit()
 
-    log(f'{os.path.getsize(target):8d} Byte\t', target_name)
-    log(f'{os.path.getsize(f"{target}.opt.old"):8d} Byte\t', f"{target_name}.opt.old")
-    log(f'{os.path.getsize(f"{target}.opt"):8d} Byte\t', f"{target_name}.opt")
+    log(f'{target.with_suffix(default).stat().st_size:8d} Byte\t', target.with_suffix(default).name)
+    log(f'{target.with_suffix(w_optim).stat().st_size:8d} Byte\t', target.with_suffix(w_optim).name)
+    log(f'{target.with_suffix(w_strip).stat().st_size:8d} Byte\t', target.with_suffix(w_strip).name)
     log("🙆", "End Optimize && Strip")
 
-    log("😄", 'Copy Binary to ./build/', target_name)
-    pathlib.Path("./build").mkdir(exist_ok=True)
-    shutil.copy(f"{target}.opt", opj("./build/", target_name))
+    log("😄", 'Copy Binary to', f"`{local_build_path / target_name}`")
+    local_build_path.mkdir(exist_ok=True)
+    shutil.copy(target.with_suffix(w_strip), local_build_path / target_name)
 
 
 def run_sim():
-    sim_bin_path = opj(sim_path, "Simulator")
-    if not pathlib.Path(sim_bin_path).exists():
+    sim_bin_path = sim_path / sim_name
+    if not Path(sim_bin_path).exists():
         log("😭😢😿", "Start Simulator Failed")
         exit(114514)
-    test_wasm_path = opj(sim_path, 'test.wasm')
+    test_wasm_path = sim_path / target_name
     log("😁", 'Copy Binary to', f"`{test_wasm_path}`")
-    shutil.copy(opj("./build/", target_name), test_wasm_path)
+    shutil.copy(local_build_path / target_name, test_wasm_path)
     log("⌚️", "Run Simulator Start")
     run(sim_bin_path, cwd=sim_path)
     log("🙆", "Run Simulator End")
