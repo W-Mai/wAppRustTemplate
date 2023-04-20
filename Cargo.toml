@@ -14,7 +14,7 @@ path = "src/app.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-wasm_allocator = { git = "https://github.com/W-Mai/wasm_allocator", rev = "98e6728c" }
+wasm_allocator = "0.1.1"
 
 # 使用`cargo build`编译时需要的配置
 [profile.dev]
