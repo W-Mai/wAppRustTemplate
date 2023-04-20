@@ -9,9 +9,10 @@ use alloc::boxed::Box;
 use alloc::string::String;
 use wasm_allocator::Heap;
 
-mod applib;
+mod utils;
 
-use crate::applib::*;
+use xwrapup_rs::*;
+use xwrapup_rs::xwu::Obj;
 
 
 // Global Num
@@ -20,7 +21,6 @@ static mut GNUM: i32 = 3;
 #[macro_use]
 mod tests {
     use crate::*;
-    use crate::applib::xwu::Obj;
 
     pub fn test_directly_println() {
         let a: i32 = 4321;
