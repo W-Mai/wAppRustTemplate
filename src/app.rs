@@ -29,7 +29,7 @@ mod tests {
     }
 
     pub fn test_vec_log() {
-        let vec = vec!["I\0", "am\0", "your\0", "father\0"];
+        let vec = vec!["Welcome\0", "to\0", "the\0", "X-TRACK\0", "plug-in\0", "system\0"];
         for s in vec {
             log!(s);
         }
