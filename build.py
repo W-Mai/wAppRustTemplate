@@ -16,6 +16,7 @@ local_build_path = Path("./build")
 
 sim_name = "Simulator"
 sim_path = Path(os.environ.get("SIM_PATH", "../../../Vendor/Simulator/build"))
+res_path = sim_path / "Resource"
 
 
 def check_env():
@@ -90,7 +91,7 @@ def run_sim():
     if not Path(sim_bin_path).exists():
         log("😭😢😿", "Start Simulator Failed")
         exit(114514)
-    test_wasm_path = sim_path / target_name
+    test_wasm_path = res_path / target_name
     log("😁", 'Copy Binary to', f"`{test_wasm_path}`")
     shutil.copy(local_build_path / target_name, test_wasm_path)
     log("⌚️", "Run Simulator Start")

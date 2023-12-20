@@ -16,7 +16,7 @@ path = "src/app.rs"
 
 [dependencies]
 wasm_allocator = "0.1.1"
-xwrapup_rs = { git = "https://github.com/W-Mai/xwrapup_rs", rev = "eb6e489" }
+xwrapup_rs = { git = "https://github.com/W-Mai/xwrapup_rs", rev = "4073bd77134780ea95e44de945d53372a97bd792"}
 
 # 使用`cargo build`编译时需要的配置
 [profile.dev]

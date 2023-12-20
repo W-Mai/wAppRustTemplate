@@ -61,9 +61,16 @@ mod tests {
 
         obj2.set_x(50);
         obj2.set_y(20);
-        obj1.set_width(300);
+        obj1.set_width(100);
+        obj1.set_height(50);
+        obj2.set_width(200);
+        obj2.set_height(200);
+        obj2.set_scroll_left(50);
+        let coords = obj2.get_ori_coords();
 
         println!("Width: {}", obj1.get_width());
+        println!("Coords: {:?}", obj1.get_scroll_right());
+        println!("Coords: {:?}", coords);
     }
 }
 
